@@ -8,7 +8,7 @@ import org.junit.runners.Suite;
  * @description
  * @DATE 2019/10/14 21:30
  */
-@Suite.SuiteClasses({BeanFactoryTest.class, ApplicationContextTest.class})
+@Suite.SuiteClasses({BeanFactoryTest.class, ApplicationContextTest.class, ResourceTest.class})
 @RunWith(Suite.class)
 public class V1TestAllSuites {
 }
