@@ -26,55 +26,24 @@ import java.util.concurrent.ConcurrentHashMap;
  * @description
  * @DATE 2019/10/14 15:06
  */
-public class DefaultBeanFactory implements BeanFactory {
+public class DefaultBeanFactory implements BeanFactory, BeanDefinitionRegistry {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultBeanFactory.class);
 
-    public static final String ID_ATTRIBUTE = "id";
-
-    public static final String CLASS_ATTRIBUTE = "class";
-
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
 
-    public DefaultBeanFactory(String configFile) {
-        loadBeanDefinition(configFile);
-    }
-
-    private void loadBeanDefinition(String configFile) {
-        InputStream is = null;
-        try {
-            ClassLoader c1 = ClassUtils.getDefaultClassLoader();
-            is = c1.getResourceAsStream(configFile);
-            SAXReader reader = new SAXReader();
-            Document doc = reader.read(is);
-
-            Element root = doc.getRootElement(); // beans
-            Iterator iter = root.elementIterator();
-            while (iter.hasNext()) { // bean
-                Element ele = (Element) iter.next();
-                String id = ele.attributeValue(ID_ATTRIBUTE);
-                String beanClassName = ele.attributeValue(CLASS_ATTRIBUTE);
-                BeanDefinition bd = new GenericBeanDefinition(id, beanClassName);
-                this.beanDefinitionMap.put(id, bd);
-            }
-
-        } catch (DocumentException e) {
-            throw new BeanDefinitionStoreExpcetion("parse configFile '" + configFile + "' error", e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    public DefaultBeanFactory() {
 
     }
 
     @Override
     public BeanDefinition getBeanDefinition(String beanId) {
         return this.beanDefinitionMap.get(beanId);
+    }
+
+    @Override
+    public void registerBeanDefinition(String beanId, BeanDefinition bd) {
+        this.beanDefinitionMap.put(beanId, bd);
     }
 
     @Override
