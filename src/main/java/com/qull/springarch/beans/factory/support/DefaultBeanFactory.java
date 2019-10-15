@@ -1,5 +1,7 @@
 package com.qull.springarch.beans.factory.support;
 
+import com.qull.springarch.beans.PropertyValue;
+import com.qull.springarch.beans.SimpleTypeConverter;
 import com.qull.springarch.beans.factory.BeanCreationException;
 import com.qull.springarch.beans.factory.BeanDefinition;
 import com.qull.springarch.beans.factory.BeanFactory;
@@ -8,6 +10,12 @@ import com.qull.springarch.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @description
  * @DATE 2019/10/14 15:06
  */
-public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory, BeanDefinitionRegistry, ConfigurableBeanFactory {
+public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements BeanDefinitionRegistry, ConfigurableBeanFactory {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultBeanFactory.class);
 
@@ -45,9 +53,9 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
             log.error("bean {} not exists", beanId);
             throw new BeanCreationException("bean '" + beanId + "' not exists");
         }
-        if(bd.isSingleton()) {
-            Object bean = getSingleton(beanId);
-            if(bean == null) {
+        if (bd.isSingleton()) {
+            Object bean = this.getSingleton(beanId);
+            if (bean == null) {
                 bean = createBean(bd);
                 this.registrySingleton(beanId, bean);
             }
@@ -68,6 +76,44 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
     }
 
     private Object createBean(BeanDefinition bd) {
+        // 创建实例
+        Object bean = instantiateBean(bd);
+        // 设置属性
+        populateBean(bd, bean);
+        return bean;
+    }
+
+    private void populateBean(BeanDefinition bd, Object bean) {
+        List<PropertyValue> pvs = bd.getPropertyValues();
+        if (pvs == null || pvs.isEmpty()) {
+            return;
+        }
+
+        BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this);
+        SimpleTypeConverter converter = new SimpleTypeConverter();
+        
+        try {
+            for (PropertyValue pv : pvs) {
+                String propertyName = pv.getName();
+                Object originalValue = pv.getValue();
+                Object resolvedValue = valueResolver.resolveValueIfNecessary(originalValue);
+
+                BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
+                PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
+                for (PropertyDescriptor pd : pds) {
+                    if (pd.getName().equals(propertyName)) {
+                        Object convertedValue = converter.convertIfNecessary(resolvedValue, pd.getPropertyType());
+                        pd.getWriteMethod().invoke(bean, convertedValue);
+                        break;
+                    }
+                }
+            }
+        } catch (IntrospectionException | InvocationTargetException | IllegalAccessException e) {
+            throw new BeanCreationException("Failed to obtain BeanInfo for class [ " + bd.getBeanClassName() + "]", e);
+        }
+    }
+
+    private Object instantiateBean(BeanDefinition bd) {
         ClassLoader c1 = this.getBeanClassLoader();
         String beanClassName = bd.getBeanClassName();
         try {

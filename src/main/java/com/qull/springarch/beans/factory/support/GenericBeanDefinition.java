@@ -1,6 +1,10 @@
 package com.qull.springarch.beans.factory.support;
 
+import com.qull.springarch.beans.PropertyValue;
 import com.qull.springarch.beans.factory.BeanDefinition;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author kzh
@@ -28,6 +32,8 @@ public class GenericBeanDefinition implements BeanDefinition {
     private boolean prototype = false;
 
     private String scope = SCOPE_DEFAULT;
+
+    List<PropertyValue> propertyValues = new ArrayList<>();
 
     public GenericBeanDefinition() {}
 
@@ -61,5 +67,9 @@ public class GenericBeanDefinition implements BeanDefinition {
     @Override
     public String getScope() {
         return this.scope;
+    }
+
+    public List<PropertyValue> getPropertyValues() {
+        return this.propertyValues;
     }
 }

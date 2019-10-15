@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
 
-    private static final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(64);
+    private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(64);
 
     @Override
     public void registrySingleton(String beanName, Object singletonObject) {
