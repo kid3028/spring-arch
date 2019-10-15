@@ -34,9 +34,13 @@ public class BeanFactoryTest {
         reader.loadBeanDefinitions(new ClassPathResource("petstore-v1.xml"));
         BeanDefinition bd = factory.getBeanDefinition("petStore");
         Assert.assertEquals("com.qull.springarch.service.v1.PetStoreService", bd.getBeanClassName());
-
+        Assert.assertTrue(bd.isSingleton());
+        Assert.assertFalse(bd.isPrototype());
+        Assert.assertEquals(BeanDefinition.SCOPE_DEFAULT, bd.getScope());
         PetStoreService petStore = (PetStoreService) factory.getBean("petStore");
         Assert.assertNotNull(petStore);
+        PetStoreService petStore2 = (PetStoreService) factory.getBean("petStore");
+        Assert.assertEquals(petStore, petStore2);
     }
 
     @Test

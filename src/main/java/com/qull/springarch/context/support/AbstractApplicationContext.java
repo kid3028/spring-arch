@@ -4,6 +4,7 @@ import com.qull.springarch.beans.factory.support.DefaultBeanFactory;
 import com.qull.springarch.beans.factory.xml.XmlBeanDefinitionReader;
 import com.qull.springarch.context.ApplicationContext;
 import com.qull.springarch.core.io.Resource;
+import com.qull.springarch.util.ClassUtils;
 
 /**
  * @author kzh
@@ -14,8 +15,11 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     private DefaultBeanFactory factory;
 
+    private ClassLoader beanClassLoader;
+
     public AbstractApplicationContext(String configFile) {
         factory = new DefaultBeanFactory();
+        factory.setBeanClassLoader(this.getBeanClassLoader());
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
         reader.loadBeanDefinitions(getResource(configFile));
     }
@@ -25,5 +29,14 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     @Override
     public Object getBean(String beanId) {
         return factory.getBean(beanId);
+    }
+
+    @Override
+    public void setBeanClassLoader(ClassLoader beanClassLoader) {
+        this.beanClassLoader = beanClassLoader;
+    }
+
+    public ClassLoader getBeanClassLoader() {
+        return (this.beanClassLoader != null ? this.beanClassLoader : ClassUtils.getDefaultClassLoader());
     }
 }

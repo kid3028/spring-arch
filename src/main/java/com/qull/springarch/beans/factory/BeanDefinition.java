@@ -13,5 +13,15 @@ public interface BeanDefinition {
 
     public static final String SCOPE_DEFAULT = "";
 
+
     String getBeanClassName();
+
+    boolean isSingleton();
+
+    boolean isPrototype();
+
+    void setScope(String scope);
+
+    String getScope();
+
 }

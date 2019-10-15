@@ -2,22 +2,12 @@ package com.qull.springarch.beans.factory.support;
 
 import com.qull.springarch.beans.factory.BeanCreationException;
 import com.qull.springarch.beans.factory.BeanDefinition;
-import com.qull.springarch.beans.factory.BeanDefinitionStoreExpcetion;
 import com.qull.springarch.beans.factory.BeanFactory;
+import com.qull.springarch.config.ConfigurableBeanFactory;
 import com.qull.springarch.util.ClassUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.PrivateKey;
-import java.sql.Statement;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,9 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @description
  * @DATE 2019/10/14 15:06
  */
-public class DefaultBeanFactory implements BeanFactory, BeanDefinitionRegistry {
+public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory, BeanDefinitionRegistry, ConfigurableBeanFactory {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultBeanFactory.class);
+
+    private ClassLoader classLoader;
 
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
 
@@ -53,13 +45,36 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionRegistry {
             log.error("bean {} not exists", beanId);
             throw new BeanCreationException("bean '" + beanId + "' not exists");
         }
-        ClassLoader c1 = ClassUtils.getDefaultClassLoader();
+        if(bd.isSingleton()) {
+            Object bean = getSingleton(beanId);
+            if(bean == null) {
+                bean = createBean(bd);
+                this.registrySingleton(beanId, bean);
+            }
+            return bean;
+        }
+        return createBean(bd);
+
+    }
+
+    @Override
+    public void setBeanClassLoader(ClassLoader beanClassLoader) {
+        this.classLoader = beanClassLoader;
+    }
+
+    @Override
+    public ClassLoader getBeanClassLoader() {
+        return (this.classLoader != null ? this.classLoader : ClassUtils.getDefaultClassLoader());
+    }
+
+    private Object createBean(BeanDefinition bd) {
+        ClassLoader c1 = this.getBeanClassLoader();
+        String beanClassName = bd.getBeanClassName();
         try {
-            Class<?> beanClass = c1.loadClass(bd.getBeanClassName());
+            Class<?> beanClass = c1.loadClass(beanClassName);
             return beanClass.newInstance();
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            log.error("create bean {} error : ", beanId, e);
-            throw new BeanCreationException("create bean '" + beanId + "' error", e);
+            throw new BeanCreationException("create bean for '" + bd.getBeanClassName() + "' fail", e);
         }
     }
 }
