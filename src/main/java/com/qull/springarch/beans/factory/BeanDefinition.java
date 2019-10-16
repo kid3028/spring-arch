@@ -1,5 +1,6 @@
 package com.qull.springarch.beans.factory;
 
+import com.qull.springarch.beans.ConstructorArgument;
 import com.qull.springarch.beans.PropertyValue;
 
 import java.util.List;
@@ -30,4 +31,9 @@ public interface BeanDefinition {
 
     List<PropertyValue> getPropertyValues();
 
+    ConstructorArgument getConstructorArgument();
+
+    String getBeanId();
+
+    boolean hasConstructorArgumentValues();
 }

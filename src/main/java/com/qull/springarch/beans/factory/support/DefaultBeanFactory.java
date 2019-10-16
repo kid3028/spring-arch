@@ -47,7 +47,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
     }
 
     @Override
-    public Object getBean(String beanId) {
+    public Object  getBean(String beanId) {
         BeanDefinition bd = this.getBeanDefinition(beanId);
         if (bd == null) {
             log.error("bean {} not exists", beanId);
@@ -114,13 +114,18 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
     }
 
     private Object instantiateBean(BeanDefinition bd) {
-        ClassLoader c1 = this.getBeanClassLoader();
-        String beanClassName = bd.getBeanClassName();
-        try {
-            Class<?> beanClass = c1.loadClass(beanClassName);
-            return beanClass.newInstance();
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            throw new BeanCreationException("create bean for '" + bd.getBeanClassName() + "' fail", e);
+        if (bd.hasConstructorArgumentValues()) {
+            ConstructorResolver resolver = new ConstructorResolver(this);
+            return resolver.autowireConstructor(bd);
+        }else {
+            ClassLoader c1 = this.getBeanClassLoader();
+            String beanClassName = bd.getBeanClassName();
+            try {
+                Class<?> beanClass = c1.loadClass(beanClassName);
+                return beanClass.newInstance();
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                throw new BeanCreationException("create bean for '" + bd.getBeanClassName() + "' fail", e);
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.qull.springarch.beans.factory.support;
 
+import com.qull.springarch.beans.factory.BeanDefinition;
+import com.qull.springarch.beans.factory.BeanFactory;
 import com.qull.springarch.config.RuntimeBeanReference;
 import com.qull.springarch.config.TypedStringValue;
 
@@ -11,9 +13,9 @@ import javax.management.loading.PrivateClassLoader;
  * @DATE 2019/10/15 17:02
  */
 public class BeanDefinitionValueResolver {
-    private final DefaultBeanFactory factory;
+    private final BeanFactory factory;
 
-    public BeanDefinitionValueResolver(DefaultBeanFactory factory) {
+    public BeanDefinitionValueResolver(BeanFactory factory) {
         this.factory = factory;
     }
 
