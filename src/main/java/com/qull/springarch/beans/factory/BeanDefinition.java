@@ -21,6 +21,8 @@ public interface BeanDefinition {
 
     String getBeanClassName();
 
+    void setBeanClassName(String beanClassName);
+
     boolean isSingleton();
 
     boolean isPrototype();
@@ -34,6 +36,8 @@ public interface BeanDefinition {
     ConstructorArgument getConstructorArgument();
 
     String getBeanId();
+
+    void setId(String beanName);
 
     boolean hasConstructorArgumentValues();
 }

@@ -51,6 +51,11 @@ public class GenericBeanDefinition implements BeanDefinition {
     }
 
     @Override
+    public void setBeanClassName(String beanClassName) {
+        this.beanClassName = beanClassName;
+    }
+
+    @Override
     public boolean isSingleton() {
         return this.singleton;
     }
@@ -84,6 +89,11 @@ public class GenericBeanDefinition implements BeanDefinition {
     @Override
     public String getBeanId() {
         return this.id;
+    }
+
+    @Override
+    public void setId(String beanName) {
+        this.id = beanName;
     }
 
     @Override
