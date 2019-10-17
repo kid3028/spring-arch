@@ -4,7 +4,7 @@ import com.qull.springarch.beans.PropertyValue;
 import com.qull.springarch.beans.factory.BeanDefinition;
 import com.qull.springarch.beans.factory.support.DefaultBeanFactory;
 import com.qull.springarch.beans.factory.xml.XmlBeanDefinitionReader;
-import com.qull.springarch.config.RuntimeBeanReference;
+import com.qull.springarch.beans.factory.config.RuntimeBeanReference;
 import com.qull.springarch.core.io.ClassPathResource;
 import org.junit.Assert;
 import org.junit.Test;

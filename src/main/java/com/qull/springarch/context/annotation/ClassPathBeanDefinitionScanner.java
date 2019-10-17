@@ -60,7 +60,7 @@ public class ClassPathBeanDefinitionScanner {
                 MetadataReader reader = new SimpleMetadataReader(resource);
                 if (reader.getAnnotationMetadata().hasAnnotation(Component.class.getName())) {
                     ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(reader.getAnnotationMetadata());
-                    String beanName = this.beanNameGenerator.generateBeanNAme(sbd, this.registry);
+                    String beanName = this.beanNameGenerator.generateBeanName(sbd, this.registry);
                     sbd.setId(beanName);
                     candidates.add(sbd);
                 }

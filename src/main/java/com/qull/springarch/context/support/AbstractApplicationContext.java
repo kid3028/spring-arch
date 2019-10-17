@@ -1,5 +1,7 @@
 package com.qull.springarch.context.support;
 
+import com.qull.springarch.beans.factory.annotation.AutowiredAnnotationProcessor;
+import com.qull.springarch.beans.factory.config.ConfigurableBeanFactory;
 import com.qull.springarch.beans.factory.support.DefaultBeanFactory;
 import com.qull.springarch.beans.factory.xml.XmlBeanDefinitionReader;
 import com.qull.springarch.context.ApplicationContext;
@@ -22,6 +24,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         factory.setBeanClassLoader(this.getBeanClassLoader());
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
         reader.loadBeanDefinitions(getResource(configFile));
+        this.registerBeanProcessors(factory);
     }
 
     protected abstract Resource getResource(String configFile);
@@ -31,12 +34,18 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         return factory.getBean(beanId);
     }
 
-    @Override
     public void setBeanClassLoader(ClassLoader beanClassLoader) {
         this.beanClassLoader = beanClassLoader;
     }
 
     public ClassLoader getBeanClassLoader() {
         return (this.beanClassLoader != null ? this.beanClassLoader : ClassUtils.getDefaultClassLoader());
+    }
+
+    protected void registerBeanProcessors(ConfigurableBeanFactory beanFactory) {
+        AutowiredAnnotationProcessor postProcessor = new AutowiredAnnotationProcessor();
+        postProcessor.setBeanFactory(beanFactory);
+        beanFactory.addBeanPostProcessor(postProcessor);
+
     }
 }

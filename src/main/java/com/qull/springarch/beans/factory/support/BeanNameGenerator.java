@@ -9,5 +9,5 @@ import com.qull.springarch.beans.factory.BeanDefinition;
  */
 public interface BeanNameGenerator {
 
-    String generateBeanNAme(BeanDefinition bd, BeanDefinitionRegistry registry);
+    String generateBeanName(BeanDefinition bd, BeanDefinitionRegistry registry);
 }

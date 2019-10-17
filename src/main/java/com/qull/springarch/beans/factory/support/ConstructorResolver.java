@@ -5,15 +5,12 @@ import com.qull.springarch.beans.SimpleTypeConverter;
 import com.qull.springarch.beans.TypeConverter;
 import com.qull.springarch.beans.factory.BeanCreationException;
 import com.qull.springarch.beans.factory.BeanDefinition;
-import com.qull.springarch.config.ConfigurableBeanFactory;
-import com.qull.springarch.config.RuntimeBeanReference;
-import com.qull.springarch.config.TypedStringValue;
+import com.qull.springarch.beans.factory.config.ConfigurableBeanFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -4,8 +4,10 @@ import com.qull.springarch.beans.PropertyValue;
 import com.qull.springarch.beans.SimpleTypeConverter;
 import com.qull.springarch.beans.factory.BeanCreationException;
 import com.qull.springarch.beans.factory.BeanDefinition;
-import com.qull.springarch.beans.factory.BeanFactory;
-import com.qull.springarch.config.ConfigurableBeanFactory;
+import com.qull.springarch.beans.factory.config.BeanPostProcessor;
+import com.qull.springarch.beans.factory.config.ConfigurableBeanFactory;
+import com.qull.springarch.beans.factory.config.DependencyDescriptor;
+import com.qull.springarch.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import com.qull.springarch.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +34,8 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
     private ClassLoader classLoader;
 
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
+
+    private List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     public DefaultBeanFactory() {
 
@@ -75,6 +80,16 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
         return (this.classLoader != null ? this.classLoader : ClassUtils.getDefaultClassLoader());
     }
 
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor postProcessor) {
+        this.beanPostProcessors.add(postProcessor);
+    }
+
+    @Override
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return this.beanPostProcessors;
+    }
+
     private Object createBean(BeanDefinition bd) {
         // 创建实例
         Object bean = instantiateBean(bd);
@@ -84,6 +99,11 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
     }
 
     private void populateBean(BeanDefinition bd, Object bean) {
+
+        for (BeanPostProcessor processor : this.getBeanPostProcessors()) {
+            ((InstantiationAwareBeanPostProcessor) processor).postProcessPropertyValue(bean, bd.getBeanId());
+        }
+
         List<PropertyValue> pvs = bd.getPropertyValues();
         if (pvs == null || pvs.isEmpty()) {
             return;
@@ -125,6 +145,32 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
                 return beanClass.newInstance();
             } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
                 throw new BeanCreationException("create bean for '" + bd.getBeanClassName() + "' fail", e);
+            }
+        }
+    }
+
+    @Override
+    public Object resolveDependency(DependencyDescriptor descriptor) {
+        Class<?> typeToMatch = descriptor.getDependencyType();
+        for (BeanDefinition bd : this.beanDefinitionMap.values()) {
+            // 确保BeanDe有class对象
+            resolveBeanClass(bd);
+            Class<?> beanClass = bd.getBeanClass();
+            if (typeToMatch.isAssignableFrom(beanClass)) {
+                return this.getBean(bd.getBeanId());
+            }
+        }
+        return null;
+    }
+
+    private void resolveBeanClass(BeanDefinition bd) {
+        if (bd.hasBeanClass()) {
+            return;
+        }else {
+            try {
+                bd.resolveBeanClass(this.getBeanClassLoader());
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("Can't load class : " + bd.getBeanClassName());
             }
         }
     }

@@ -1,11 +1,8 @@
 package com.qull.springarch.beans.factory.support;
 
-import com.qull.springarch.beans.factory.BeanDefinition;
 import com.qull.springarch.beans.factory.BeanFactory;
-import com.qull.springarch.config.RuntimeBeanReference;
-import com.qull.springarch.config.TypedStringValue;
-
-import javax.management.loading.PrivateClassLoader;
+import com.qull.springarch.beans.factory.config.RuntimeBeanReference;
+import com.qull.springarch.beans.factory.config.TypedStringValue;
 
 /**
  * @author kzh

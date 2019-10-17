@@ -19,7 +19,7 @@ import java.util.Set;
  */
 public class AnnotationBeanNameGenerator implements BeanNameGenerator {
     @Override
-    public String generateBeanNAme(BeanDefinition bd, BeanDefinitionRegistry registry) {
+    public String generateBeanName(BeanDefinition bd, BeanDefinitionRegistry registry) {
         if (bd instanceof AnnotationBeanDefinition) {
             String beanName = determineBeanNameFromAnnotation((AnnotationBeanDefinition) bd);
             if (StringUtils.hasText(beanName)) {

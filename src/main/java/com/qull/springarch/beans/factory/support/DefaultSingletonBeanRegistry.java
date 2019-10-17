@@ -1,6 +1,6 @@
 package com.qull.springarch.beans.factory.support;
 
-import com.qull.springarch.config.SingletonBeanRegistry;
+import com.qull.springarch.beans.factory.config.SingletonBeanRegistry;
 import com.qull.springarch.util.Assert;
 
 import java.util.Map;

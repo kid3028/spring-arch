@@ -1,4 +1,4 @@
-package com.qull.springarch.config;
+package com.qull.springarch.beans.factory.config;
 
 /**
  * @author kzh

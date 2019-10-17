@@ -19,6 +19,7 @@ public class PetStoreService {
     @Autowired
     private AccountDao accountDao;
 
+    @Autowired
     private ItemDao itemDao;
 
     private int version;
