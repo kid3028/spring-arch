@@ -22,9 +22,9 @@ public class ConstructorResolver {
 
     private static final Logger log = LoggerFactory.getLogger(ConstructorResolver.class);
 
-    private ConfigurableBeanFactory factory;
+    private AbstractBeanFactory factory;
 
-    public ConstructorResolver(ConfigurableBeanFactory factory) {
+    public ConstructorResolver(AbstractBeanFactory factory) {
         this.factory = factory;
     }
 //
@@ -113,11 +113,16 @@ public class ConstructorResolver {
 
     private boolean valueMatchTypes(Class<?>[] parameterTypes, List<ConstructorArgument.ValueHolder> valueHolders, Object[] argsToUse, BeanDefinitionValueResolver valueResolver, TypeConverter typeConverter) {
         for (int i = 0; i < parameterTypes.length; i++) {
+            // 获取参数的值，可能是TypeStringValue，也可能是RuntimeBeanReference
             ConstructorArgument.ValueHolder valueHolder = valueHolders.get(i);
             Object originValue = valueHolder.getValue();
             try{
+                // 获取到真正的值
                 Object resolveValue = valueResolver.resolveValueIfNecessary(originValue);
+                // 如果参数类型是int， 但是值是字符串，例如“3”，还需要转型
+                // 如果转型失败，则抛出异常，说明这个构造函数不可用
                 Object convertValue = typeConverter.convertIfNecessary(resolveValue, parameterTypes[i]);
+                // 转型成功，记录下来
                 argsToUse[i] = convertValue;
             }catch(Exception e) {
                 log.error("autowire value failed , {}", e);

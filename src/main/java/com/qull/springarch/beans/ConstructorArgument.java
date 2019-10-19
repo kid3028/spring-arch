@@ -16,6 +16,10 @@ import java.util.List;
 public class ConstructorArgument {
     private final List<ValueHolder> argumentValues = new ArrayList<>();
 
+     public void addArgumentValue(Object value) {
+         this.argumentValues.add(new ValueHolder(value));
+     }
+
     public void addArgumentValue(Object value, String type) {
         this.argumentValues.add(new ValueHolder(value, type));
     }

@@ -7,12 +7,12 @@ import com.qull.springarch.beans.exception.BeansException;
  * @description
  * @DATE 2019/10/14 16:56
  */
-public class BeanDefinitionStoreExpcetion extends BeansException {
-    public BeanDefinitionStoreExpcetion(String message) {
+public class BeanDefinitionStoreException extends BeansException {
+    public BeanDefinitionStoreException(String message) {
         super(message);
     }
 
-    public BeanDefinitionStoreExpcetion(String message, Throwable cause) {
+    public BeanDefinitionStoreException(String message, Throwable cause) {
         super(message, cause);
     }
 }

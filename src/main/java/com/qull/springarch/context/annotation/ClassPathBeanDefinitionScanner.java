@@ -1,7 +1,7 @@
 package com.qull.springarch.context.annotation;
 
 import com.qull.springarch.beans.factory.BeanDefinition;
-import com.qull.springarch.beans.factory.BeanDefinitionStoreExpcetion;
+import com.qull.springarch.beans.factory.BeanDefinitionStoreException;
 import com.qull.springarch.beans.factory.support.BeanDefinitionRegistry;
 import com.qull.springarch.beans.factory.support.BeanNameGenerator;
 import com.qull.springarch.core.io.Resource;
@@ -65,7 +65,7 @@ public class ClassPathBeanDefinitionScanner {
                     candidates.add(sbd);
                 }
             } catch (Throwable e) {
-                throw new BeanDefinitionStoreExpcetion("Failed to read candidate component class : " + resource, e);
+                throw new BeanDefinitionStoreException("Failed to read candidate component class : " + resource, e);
             }
         }
         return candidates;

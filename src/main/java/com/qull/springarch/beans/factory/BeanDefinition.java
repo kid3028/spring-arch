@@ -48,4 +48,6 @@ public interface BeanDefinition {
     boolean hasBeanClass();
 
 
+    boolean isSynthetic();
+
 }

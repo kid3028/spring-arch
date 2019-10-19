@@ -5,8 +5,7 @@ import jdk.nashorn.internal.ir.ReturnNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author kzh
@@ -125,5 +124,47 @@ public abstract class ClassUtils {
     }
 
 
+    public static Set<Class> getAllInterfacesForClassAsSet(Class<?> targetClass) {
+        return getAllInterfacesForClassAsSet(targetClass, null);
+    }
 
+    /**
+     * Return all interfaces that the given class implements as Set, including ones implemented by supperClass.
+     * if the class itself is an interface, it gets returned as sole interface.
+     *
+     * @param clazz the class to analyze for interface
+     * @param classLoader the ClassLoader that the interfaces need to be visible in (may be {@code null}
+     *                    when accepting all declared interfaces)
+     * @return all interfaces that the given object implements as Set
+     */
+    private static Set<Class> getAllInterfacesForClassAsSet(Class<?> clazz, ClassLoader classLoader) {
+        Assert.notNull(clazz, "Class must not be null");
+        if (clazz.isInterface() && isVisible(clazz, classLoader)) {
+            return Collections.singleton(clazz);
+        }
+        Set<Class> interfaces = new LinkedHashSet<>();
+        while (clazz != null) {
+            Class<?>[] ifcs = clazz.getInterfaces();
+            for (Class<?> ifc : ifcs) {
+                interfaces.addAll(getAllInterfacesForClassAsSet(ifc, classLoader));
+            }
+            clazz = clazz.getSuperclass();
+        }
+        return interfaces;
+    }
+
+    private static boolean isVisible(Class<?> clazz, ClassLoader classLoader) {
+        if (classLoader == null) {
+            return true;
+        }
+
+        try {
+            Class<?> atualClass = classLoader.loadClass(clazz.getName());
+            return clazz == atualClass;
+            // Else different interface class found
+        } catch (ClassNotFoundException e) {
+            // No interface class found
+            return false;
+        }
+    }
 }

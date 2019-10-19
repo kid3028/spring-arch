@@ -2,6 +2,7 @@ package com.qull.springarch.aop.aspectj;
 
 import com.qull.springarch.aop.Advice;
 import com.qull.springarch.aop.Pointcut;
+import com.qull.springarch.aop.config.AspectInstanceFactory;
 import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.reflect.Method;
@@ -26,16 +27,16 @@ public abstract class AbstractAspectJAdvice implements Advice {
     /**
      * 通知对象 TransactionManager
      */
-    protected Object adviceObject;
+    protected AspectInstanceFactory adviceObjectFactory;
 
-    public AbstractAspectJAdvice(Method adviceMethod, AspectJExpressionPointcut pointcut, Object adviceObject) {
+    public AbstractAspectJAdvice(Method adviceMethod, AspectJExpressionPointcut pointcut, AspectInstanceFactory adviceObjectFactory) {
         this.adviceMethod = adviceMethod;
         this.pointcut = pointcut;
-        this.adviceObject = adviceObject;
+        this.adviceObjectFactory = adviceObjectFactory;
     }
 
     public void invokeAdviceMethod() throws Throwable {
-        adviceMethod.invoke(adviceObject);
+        adviceMethod.invoke(adviceObjectFactory.getAspectInstance());
     }
 
     @Override
@@ -46,4 +47,9 @@ public abstract class AbstractAspectJAdvice implements Advice {
     public Method getAdviceMethod() {
         return this.adviceMethod;
     }
+
+    public Object getAdviceInstance() throws Exception {
+        return adviceObjectFactory.getAspectInstance();
+    }
+
 }

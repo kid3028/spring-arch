@@ -4,6 +4,7 @@ import com.qull.springarch.beans.PropertyValue;
 import com.qull.springarch.beans.SimpleTypeConverter;
 import com.qull.springarch.beans.factory.BeanCreationException;
 import com.qull.springarch.beans.factory.BeanDefinition;
+import com.qull.springarch.beans.factory.BeanFactoryAware;
 import com.qull.springarch.beans.factory.NoSuchBeanDefinitionException;
 import com.qull.springarch.beans.factory.config.BeanPostProcessor;
 import com.qull.springarch.beans.factory.config.ConfigurableBeanFactory;
@@ -28,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @description
  * @DATE 2019/10/14 15:06
  */
-public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements BeanDefinitionRegistry, ConfigurableBeanFactory {
+public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefinitionRegistry{
 
     private static final Logger log = LoggerFactory.getLogger(DefaultBeanFactory.class);
 
@@ -81,6 +82,25 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
         return bd.getBeanClass();
     }
 
+    public List<Object> getBeansByType(Class<?> type) {
+        List<Object> result = new ArrayList<>();
+        List<String> beanIds = this.getBeanIdByType(type);
+        for (String beanId : beanIds) {
+            result.add(this.getBean(beanId));
+        }
+        return result;
+    }
+
+    public List<String> getBeanIdByType(Class<?> type) {
+        List<String> result = new ArrayList<>();
+        for (String beanName : this.beanDefinitionMap.keySet()) {
+            if (type.isAssignableFrom(this.getType(beanName))) {
+                result.add(beanName);
+            }
+        }
+        return result;
+    }
+
     @Override
     public void setBeanClassLoader(ClassLoader beanClassLoader) {
         this.classLoader = beanClassLoader;
@@ -101,18 +121,48 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
         return this.beanPostProcessors;
     }
 
-    private Object createBean(BeanDefinition bd) {
+    protected Object createBean(BeanDefinition bd) {
         // 创建实例
         Object bean = instantiateBean(bd);
         // 设置属性
         populateBean(bd, bean);
+
+        bean = initializeBean(bd, bean);
         return bean;
+    }
+
+    private Object initializeBean(BeanDefinition bd, Object bean) {
+        invokeAwareMethods(bean);
+        // TODO 调用Bean的init方法暂不实现
+        if (!bd.isSynthetic()) {
+            return applyBeanPostProcessorAfterInitialization(bean, bd.getBeanId());
+        }
+        return bean;
+    }
+
+    private Object applyBeanPostProcessorAfterInitialization(Object existingBean, String beanName) {
+        Object result = existingBean;
+        for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) {
+            result = beanProcessor.afterInitialization(result, beanName);
+            if (result == null) {
+                return result;
+            }
+        }
+        return result;
+    }
+
+    private void invokeAwareMethods(Object bean) {
+        if (bean instanceof BeanFactoryAware) {
+            ((BeanFactoryAware) bean).setBeanFactory(this);
+        }
     }
 
     private void populateBean(BeanDefinition bd, Object bean) {
 
         for (BeanPostProcessor processor : this.getBeanPostProcessors()) {
-            ((InstantiationAwareBeanPostProcessor) processor).postProcessPropertyValue(bean, bd.getBeanId());
+            if(processor instanceof InstantiationAwareBeanPostProcessor) {
+                ((InstantiationAwareBeanPostProcessor) processor).postProcessPropertyValue(bean, bd.getBeanId());
+            }
         }
 
         List<PropertyValue> pvs = bd.getPropertyValues();

@@ -20,7 +20,7 @@ import java.util.List;
  * @description
  * @DATE 2019/10/18 22:15
  */
-public class CglibProxyFactory {
+public class CglibProxyFactory implements AopProxyFactory{
 
     private static final Logger log = LoggerFactory.getLogger(CglibProxyFactory.class);
 
@@ -46,6 +46,23 @@ public class CglibProxyFactory {
         this.config = config;
     }
 
+    /**
+     * Set constructor arguments to use for creating the proxy.
+     * @param constructorArgs the constructor argument values
+     * @param constructorArgTypes the constructor argument types
+     */
+	/*public void setConstructorArguments(Object[] constructorArgs, Class<?>[] constructorArgTypes) {
+		if (constructorArgs == null || constructorArgTypes == null) {
+			throw new IllegalArgumentException("Both 'constructorArgs' and 'constructorArgTypes' need to be specified");
+		}
+		if (constructorArgs.length != constructorArgTypes.length) {
+			throw new IllegalArgumentException("Number of 'constructorArgs' (" + constructorArgs.length +
+					") must match number of 'constructorArgTypes' (" + constructorArgTypes.length + ")");
+		}
+		this.constructorArgs = constructorArgs;
+		this.constructorArgTypes = constructorArgTypes;
+	}*/
+
     public void setConstructorArgTypes(Object[] constructorArgs, Class<?>[] constructorArgTypes) {
         if (constructorArgs == null || constructorArgTypes == null) {
             throw new IllegalArgumentException("Both 'constructorArgs' and 'constructorArgTypes' need to be specified");
@@ -59,11 +76,13 @@ public class CglibProxyFactory {
 
 
 
+    @Override
     public Object getProxy() {
         return getProxy(null);
     }
 
-    private Object getProxy(ClassLoader classLoader) {
+    @Override
+    public Object getProxy(ClassLoader classLoader) {
         if (log.isDebugEnabled()) {
             log.debug("Creating CGLIB proxy : target source is " + this.config.getTargetClass());
         }

@@ -1,6 +1,6 @@
 package com.qull.springarch.core.type.classreading;
 
-import com.qull.springarch.beans.factory.BeanDefinitionStoreExpcetion;
+import com.qull.springarch.beans.factory.BeanDefinitionStoreException;
 import com.qull.springarch.core.io.Resource;
 import com.qull.springarch.core.type.AnnotationMetadata;
 import com.qull.springarch.core.type.ClassMetadata;
@@ -29,7 +29,7 @@ public class SimpleMetadataReader implements MetadataReader {
         try(InputStream is = resource.getInputStream()) {
             reader = new ClassReader(resource.getInputStream());
         }catch (IOException e) {
-            throw new BeanDefinitionStoreExpcetion("resource handler failed", e);
+            throw new BeanDefinitionStoreException("resource handler failed", e);
         }
         AnnotationMetadataReadingVisitor visitor = new AnnotationMetadataReadingVisitor();
         reader.accept(visitor, ClassReader.SKIP_DEBUG);

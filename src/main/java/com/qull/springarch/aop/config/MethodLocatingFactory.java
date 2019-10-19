@@ -2,7 +2,8 @@ package com.qull.springarch.aop.config;
 
 import com.qull.springarch.beans.BeanUtils;
 import com.qull.springarch.beans.factory.BeanFactory;
-import com.qull.springarch.beans.factory.support.DefaultBeanFactory;
+import com.qull.springarch.beans.factory.BeanFactoryAware;
+import com.qull.springarch.beans.factory.FactoryBean;
 import com.qull.springarch.util.StringUtils;
 
 import java.lang.reflect.Method;
@@ -12,7 +13,7 @@ import java.lang.reflect.Method;
  * @description
  * @DATE 2019/10/18 7:41
  */
-public class MethodLocatingFactory {
+public class MethodLocatingFactory implements FactoryBean<Method>, BeanFactoryAware {
 
     private String targetBeanName;
 
@@ -49,7 +50,13 @@ public class MethodLocatingFactory {
         }
     }
 
+    @Override
     public Method getObject() {
         return this.method;
+    }
+
+    @Override
+    public Class<?> getObjectType() {
+        return method.getClass();
     }
 }

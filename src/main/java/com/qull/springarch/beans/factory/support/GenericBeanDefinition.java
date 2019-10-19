@@ -1,5 +1,6 @@
 package com.qull.springarch.beans.factory.support;
 
+import com.qull.springarch.aop.config.MethodLocatingFactory;
 import com.qull.springarch.beans.ConstructorArgument;
 import com.qull.springarch.beans.PropertyValue;
 import com.qull.springarch.beans.factory.BeanDefinition;
@@ -38,12 +39,32 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     ConstructorArgument constructorArgument = new ConstructorArgument();
 
+    /**
+     * 表明这个Bean定义是不是我们自己合成的
+     */
+    private boolean isSynthetic = false;
+
+    public GenericBeanDefinition(Class<?> clazz) {
+        this.beanClass = clazz;
+        this.beanClassName = clazz.getName();
+    }
+
     public GenericBeanDefinition() {}
 
     public GenericBeanDefinition(String id, String beanClassName) {
         this.id = id;
         this.beanClassName = beanClassName;
     }
+
+    @Override
+    public boolean isSynthetic() {
+        return this.isSynthetic;
+    }
+
+    public void setSynthetic(boolean isSynthetic) {
+        this.isSynthetic = isSynthetic;
+    }
+
 
     @Override
     public String getBeanClassName() {

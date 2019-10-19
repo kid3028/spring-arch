@@ -2,8 +2,7 @@ package com.qull.springarch.test.v1;
 
 import com.qull.springarch.beans.factory.BeanCreationException;
 import com.qull.springarch.beans.factory.BeanDefinition;
-import com.qull.springarch.beans.factory.BeanDefinitionStoreExpcetion;
-import com.qull.springarch.beans.factory.BeanFactory;
+import com.qull.springarch.beans.factory.BeanDefinitionStoreException;
 import com.qull.springarch.beans.factory.support.DefaultBeanFactory;
 import com.qull.springarch.beans.factory.xml.XmlBeanDefinitionReader;
 import com.qull.springarch.core.io.ClassPathResource;
@@ -54,7 +53,7 @@ public class BeanFactoryTest {
         Assert.fail();
     }
 
-    @Test(expected = BeanDefinitionStoreExpcetion.class)
+    @Test(expected = BeanDefinitionStoreException.class)
     public void testInvalidXML() {
         reader.loadBeanDefinitions(new ClassPathResource("invalid-v1.xml"));
     }

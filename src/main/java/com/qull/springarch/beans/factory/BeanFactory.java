@@ -1,5 +1,7 @@
 package com.qull.springarch.beans.factory;
 
+import java.util.List;
+
 /**
  * @author kzh
  * @description
@@ -9,4 +11,6 @@ public interface BeanFactory {
     Object getBean(String beanId);
 
     Class<?> getType(String name) throws NoSuchBeanDefinitionException;
+
+    List<Object> getBeansByType(Class<?> type);
 }

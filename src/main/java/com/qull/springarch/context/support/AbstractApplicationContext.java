@@ -1,5 +1,6 @@
 package com.qull.springarch.context.support;
 
+import com.qull.springarch.aop.aspectj.AspectJAutoProxyCreator;
 import com.qull.springarch.beans.factory.NoSuchBeanDefinitionException;
 import com.qull.springarch.beans.factory.annotation.AutowiredAnnotationProcessor;
 import com.qull.springarch.beans.factory.config.ConfigurableBeanFactory;
@@ -8,6 +9,8 @@ import com.qull.springarch.beans.factory.xml.XmlBeanDefinitionReader;
 import com.qull.springarch.context.ApplicationContext;
 import com.qull.springarch.core.io.Resource;
 import com.qull.springarch.util.ClassUtils;
+
+import java.util.List;
 
 /**
  * @author kzh
@@ -44,13 +47,26 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     }
 
     protected void registerBeanProcessors(ConfigurableBeanFactory beanFactory) {
-        AutowiredAnnotationProcessor postProcessor = new AutowiredAnnotationProcessor();
-        postProcessor.setBeanFactory(beanFactory);
-        beanFactory.addBeanPostProcessor(postProcessor);
+        {
+            AutowiredAnnotationProcessor postProcessor = new AutowiredAnnotationProcessor();
+            postProcessor.setBeanFactory(beanFactory);
+            beanFactory.addBeanPostProcessor(postProcessor);
+        }
+
+        {
+            AspectJAutoProxyCreator postProcessor = new AspectJAutoProxyCreator();
+            postProcessor.setBeanFactory(beanFactory);
+            beanFactory.addBeanPostProcessor(postProcessor);
+        }
     }
 
     @Override
     public Class<?> getType(String name) throws NoSuchBeanDefinitionException {
         return this.factory.getType(name);
+    }
+
+    @Override
+    public List<Object> getBeansByType(Class<?> type) {
+        return this.factory.getBeansByType(type);
     }
 }
