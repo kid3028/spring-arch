@@ -1,5 +1,6 @@
 package com.qull.springarch.context.support;
 
+import com.qull.springarch.beans.factory.NoSuchBeanDefinitionException;
 import com.qull.springarch.beans.factory.annotation.AutowiredAnnotationProcessor;
 import com.qull.springarch.beans.factory.config.ConfigurableBeanFactory;
 import com.qull.springarch.beans.factory.support.DefaultBeanFactory;
@@ -46,6 +47,10 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         AutowiredAnnotationProcessor postProcessor = new AutowiredAnnotationProcessor();
         postProcessor.setBeanFactory(beanFactory);
         beanFactory.addBeanPostProcessor(postProcessor);
+    }
 
+    @Override
+    public Class<?> getType(String name) throws NoSuchBeanDefinitionException {
+        return this.factory.getType(name);
     }
 }

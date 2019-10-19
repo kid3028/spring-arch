@@ -4,6 +4,7 @@ import com.qull.springarch.beans.PropertyValue;
 import com.qull.springarch.beans.SimpleTypeConverter;
 import com.qull.springarch.beans.factory.BeanCreationException;
 import com.qull.springarch.beans.factory.BeanDefinition;
+import com.qull.springarch.beans.factory.NoSuchBeanDefinitionException;
 import com.qull.springarch.beans.factory.config.BeanPostProcessor;
 import com.qull.springarch.beans.factory.config.ConfigurableBeanFactory;
 import com.qull.springarch.beans.factory.config.DependencyDescriptor;
@@ -68,6 +69,16 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
         }
         return createBean(bd);
 
+    }
+
+    @Override
+    public Class<?> getType(String beanId) throws NoSuchBeanDefinitionException {
+        BeanDefinition bd = this.getBeanDefinition(beanId);
+        if (bd == null) {
+            throw new NoSuchBeanDefinitionException(beanId);
+        }
+        this.resolveBeanClass(bd);
+        return bd.getBeanClass();
     }
 
     @Override

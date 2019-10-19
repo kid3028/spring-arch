@@ -9,8 +9,6 @@ import com.qull.springarch.stereotype.Component;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
-
 /**
  * @author kzh
  * @description
