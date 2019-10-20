@@ -144,6 +144,9 @@ public class CglibProxyFactory implements AopProxyFactory{
         return callbacks;
     }
 
+    /**
+     * General purpose Aop callback. Used when the target is dynamic or when the proxy is not frozen
+     */
     private class DynamicAdvisedInterceptor implements MethodInterceptor, Serializable {
         private final AopConfig config;
 
