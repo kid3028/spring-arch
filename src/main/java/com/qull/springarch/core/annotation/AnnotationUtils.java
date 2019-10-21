@@ -9,7 +9,7 @@ import java.lang.reflect.AnnotatedElement;
  * @DATE 2019/10/17 9:15
  */
 public class AnnotationUtils {
-    public static <T extends Annotation> T getAnnotaion(AnnotatedElement ae, Class<T> annotationType) {
+    public static <T extends Annotation> T getAnnotation(AnnotatedElement ae, Class<T> annotationType) {
         T ann = ae.getAnnotation(annotationType);
         if (ann == null) {
             for (Annotation metaAnnotation : ae.getAnnotations()) {

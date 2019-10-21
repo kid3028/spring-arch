@@ -56,6 +56,10 @@ public class GenericBeanDefinition implements BeanDefinition {
         this.beanClassName = beanClassName;
     }
 
+    /**
+     * bean是否是合成的
+     * @return
+     */
     @Override
     public boolean isSynthetic() {
         return this.isSynthetic;

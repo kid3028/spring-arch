@@ -103,6 +103,11 @@ public class AopConfigSupport implements AopConfig {
     }
 
 
+    /**
+     * 过滤方法匹配的通知
+     * @param method
+     * @return
+     */
     @Override
     public List<Advice> getAdvices(Method method) {
         List<Advice> result = new ArrayList<>();

@@ -1,8 +1,6 @@
 package com.qull.springarch.aop.framework;
 
 import com.qull.springarch.aop.Advice;
-import com.qull.springarch.aop.framework.AopConfigSupport;
-import com.qull.springarch.aop.framework.AopProxyFactory;
 import com.qull.springarch.util.Assert;
 import com.qull.springarch.util.ClassUtils;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -29,7 +27,7 @@ public class JdkAopProxyFactory implements AopProxyFactory, InvocationHandler {
     public JdkAopProxyFactory(AopConfigSupport config) {
         Assert.notNull(config, "AdvisedSupport must not be null");
         if (config.getAdvices().size() == 0) {
-            throw new AopconfigException("No Advices specified");
+            throw new AopConfigException("No Advices specified");
         }
         this.config = config;
 
@@ -55,12 +53,15 @@ public class JdkAopProxyFactory implements AopProxyFactory, InvocationHandler {
         Object target = config.getTargetObject();
 
         Object retval;
-
+        // 获取方法匹配的通知
         List<Advice> chain = this.config.getAdvices(method);
 
+        // 通知为空，直接执行方法调用
         if (chain.isEmpty()) {
             retval = method.invoke(target, args);
-        }else {
+        }
+        // 通知不为空，加入通知
+        else {
             List<MethodInterceptor> interceptors = new ArrayList<>();
             interceptors.addAll(chain);
             retval = new ReflectiveMethodInvocation(target, method, args, interceptors).proceed();

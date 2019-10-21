@@ -35,8 +35,15 @@ public class PackageResourceLoader {
         this.classLoader = classLoader;
     }
 
+    /**
+     * 获取该包及其子包
+     * 将该包下的可处理文件转换为resource对象
+     * @param basePackage
+     * @return
+     */
     public Resource[] getResources(String basePackage) {
         Assert.notNull(basePackage, "basePackage must not be null");
+        // 转换包名为文件路径
         String location = ClassUtils.convertClassNameToResourcePath(basePackage);
         ClassLoader c1 = getClassLoader();
         URL url = c1.getResource(location);

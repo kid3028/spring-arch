@@ -54,6 +54,13 @@ public class BeanDefinitionReaderUtils {
         return id;
     }
 
+    /**
+     * 根据BeanDefinition生成beanName并完成注册  class#toHexString(hashcode)
+     * @param beanDefinition
+     * @param registry
+     * @return
+     * @throws BeanDefinitionStoreException
+     */
     public static String registerWithGeneratedName(BeanDefinition beanDefinition, BeanDefinitionRegistry registry) throws BeanDefinitionStoreException {
         String generatedName = generateBeanName(beanDefinition, registry, false);
         registry.registerBeanDefinition(generatedName, beanDefinition);

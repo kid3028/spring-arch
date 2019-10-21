@@ -27,7 +27,7 @@ public class InjectionMetadata {
         if (injectionElements == null || injectionElements.isEmpty()) {
             return;
         }
-
+        // 执行依赖注入
         for (InjectionElement element : injectionElements) {
             element.inject(target);
         }

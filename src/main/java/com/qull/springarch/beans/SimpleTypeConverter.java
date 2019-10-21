@@ -20,18 +20,31 @@ public class SimpleTypeConverter implements TypeConverter {
 
     public SimpleTypeConverter(){}
 
+    /**
+     * 进行值转换
+     * @param value
+     * @param requiredType
+     * @param <T>
+     * @return
+     * @throws TypeMismatchException
+     */
     @Override
     public <T> T convertIfNecessary(Object value, Class<T> requiredType) throws TypeMismatchException {
+        // 如果当前值能够赋予到requiredType，执行进行转换
         if (ClassUtils.isAssignableValue(requiredType, value)) {
             return (T)value;
         }else {
+            // 如果是字符串
             if (value instanceof String) {
+                // 查找对应的editor
                 PropertyEditor editor = findDefaultEditor(requiredType);
                 try {
+                    // 设置为editor属性
                     editor.setAsText((String) value);
                 }catch (IllegalArgumentException e) {
                     throw new TypeMismatchException(value, requiredType);
                 }
+                // 获取editor转换出来的值
                 return (T)editor.getValue();
             }else {
                 throw new RuntimeException("Todo : can't convert value for " + value + " class : " + requiredType);

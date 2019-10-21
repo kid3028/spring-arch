@@ -23,11 +23,15 @@ public class SimpleMetadataReader implements MetadataReader {
 
     private final Resource resource;
 
+    /**
+     * 使用asm访问class 资源
+     * @param resource
+     */
     public SimpleMetadataReader(Resource resource) {
         Assert.notNull(resource, "Resource must be not null");
         ClassReader reader;
         try(InputStream is = resource.getInputStream()) {
-            reader = new ClassReader(resource.getInputStream());
+            reader = new ClassReader(is);
         }catch (IOException e) {
             throw new BeanDefinitionStoreException("resource handler failed", e);
         }

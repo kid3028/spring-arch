@@ -2,7 +2,6 @@ package com.qull.springarch.aop.framework;
 
 import com.qull.springarch.aop.Advice;
 import com.qull.springarch.util.Assert;
-import org.omg.PortableInterceptor.Interceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cglib.core.CodeGenerationException;
@@ -41,7 +40,7 @@ public class CglibProxyFactory implements AopProxyFactory{
     public CglibProxyFactory(AopConfig config) {
         Assert.notNull(config, "AdvisedSupport must not be null");
         if (config.getAdvices().size() == 0) {
-            throw new AopconfigException("No advised and not TargetSource specified");
+            throw new AopConfigException("No advised and not TargetSource specified");
         }
         this.config = config;
     }
@@ -81,6 +80,11 @@ public class CglibProxyFactory implements AopProxyFactory{
         return getProxy(null);
     }
 
+    /**
+     * 创建代理
+     * @param classLoader the class loader to create the proxy with (or {@code null} for the low-level proxy facility's default)
+     * @return
+     */
     @Override
     public Object getProxy(ClassLoader classLoader) {
         if (log.isDebugEnabled()) {
@@ -88,11 +92,14 @@ public class CglibProxyFactory implements AopProxyFactory{
         }
 
         try {
+            // 原bean的class
             Class<?> rootClass = this.config.getTargetClass();
             Enhancer enhancer = new Enhancer();
+            // classloader不空，设置classloader
             if (classLoader != null) {
                 enhancer.setClassLoader(classLoader);
             }
+            // 设置原class为代理对象的父类
             enhancer.setSuperclass(rootClass);
             // BySpringCGLIB
             enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
@@ -116,15 +123,16 @@ public class CglibProxyFactory implements AopProxyFactory{
 //            }
             return proxy;
         } catch (CodeGenerationException e) {
-            throw new AopconfigException("Could not generate CGLIB subclass of class [ " + this.config.getTargetClass() + " ]: Common causes of this problem include using a final class or a no-visible class", e);
+            throw new AopConfigException("Could not generate CGLIB subclass of class [ " + this.config.getTargetClass() + " ]: Common causes of this problem include using a final class or a no-visible class", e);
         }catch (IllegalArgumentException e) {
-            throw new AopconfigException("Could not generate CGLIB subclass of class [" + this.config.getTargetClass() + "] Common causes of this problem include using a final class or a non-visible class", e);
+            throw new AopConfigException("Could not generate CGLIB subclass of class [" + this.config.getTargetClass() + "] Common causes of this problem include using a final class or a non-visible class", e);
         }catch (Exception e) {
-            throw new AopconfigException("Unexpected AOP exception ", e);
+            throw new AopConfigException("Unexpected AOP exception ", e);
         }
     }
 
     private Callback[] getCallbacks(Class<?> rootClass) {
+        // 生成拦截
         Callback aopInterceptor = new DynamicAdvisedInterceptor(this.config);
 
 
@@ -156,17 +164,22 @@ public class CglibProxyFactory implements AopProxyFactory{
 
         @Override
         public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
+            // 原对象
             Object target = this.config.getTargetObject();
+            // 该方法匹配的通知
             List<Advice> chain = this.config.getAdvices(method);
             Object retval;
 
             // Check whether we only have one InvokerInterceptor: thar is, no real advice, but just reflective invocation of the target
+            // 通知为空，直接调用
             if (chain.isEmpty() && Modifier.isStatic(method.getModifiers())) {
                 // we can skip creating a MethodInvocation: just invoke the target directly.
                 // Note that the final invoker must be an InvokerInterceptor, so we know it does nothing
                 // but a reflective operation on the target, and no hot swapping or fancy proxying
                 retval = method.invoke(target, args);
-            }else {
+            }
+            // 存在通知，加入拦截逻辑
+            else {
                 List<org.aopalliance.intercept.MethodInterceptor> interceptors = new ArrayList<>();
                 interceptors.addAll(chain);
                 // we need to create a method invocation...

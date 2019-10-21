@@ -21,15 +21,27 @@ public class BeanDefinitionValueResolver {
         this.factory = factory;
     }
 
+    /**
+     * 解析属性
+     * @param value
+     * @return
+     */
     public Object resolveValueIfNecessary(Object value) {
+        // 运行时
         if (value instanceof RuntimeBeanReference) {
+            // 根据属性名，从BeanFactory中找到对应的bean
             RuntimeBeanReference ref = (RuntimeBeanReference) value;
             String refName = ref.getBeanName();
             return this.factory.getBean(refName);
-        } else if (value instanceof TypedStringValue) {
+        }
+        // 字面值属性
+        else if (value instanceof TypedStringValue) {
             return ((TypedStringValue) value).getValue();
-        } else if (value instanceof BeanDefinition) {
+        }
+        // BeanDefinition属性
+        else if (value instanceof BeanDefinition) {
             BeanDefinition bd = (BeanDefinition) value;
+            // 形成内部bean
             String innerBeanName = "(inner bean)" + bd.getBeanClassName() + "#" + Integer.toHexString(System.identityHashCode(bd));
             return resolveInnerBean(innerBeanName, bd);
         }else {
@@ -39,7 +51,9 @@ public class BeanDefinitionValueResolver {
 
     private Object resolveInnerBean(String innerBeanName, BeanDefinition innerBd) {
         try {
+            // 解析内部bean
             Object innerBean = this.factory.createBean(innerBd);
+            //  如果是FactoryBean的实例，调用getObject()方法获取实际对象
             if(innerBean instanceof FactoryBean) {
                 try {
                     return ((FactoryBean<?>) innerBean).getObject();
